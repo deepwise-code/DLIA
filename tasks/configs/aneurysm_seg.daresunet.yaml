@@ -1,0 +1,79 @@
+#TASK
+TASK:
+  TYPE: 1
+  NAME: "aneurysm_seg"
+
+SEED: 1234
+METRICS: ['Dice', 'Loss', 'F1-Score', 'Recall', 'Precision']
+
+#MODEL
+MODEL:
+    NAME: "da_resunet"
+    DIM: "3d"
+    BN: "bn"
+    INPUT_CHANNEL: 1
+    ADD_COORDS: False
+    USE_MULTI_WWWL: False
+    NCLASS: 2
+    DEEP_SUPERVISION: False
+    BACKBONE:
+        ARCH: "resnet34"
+        HEAD: "A"
+    PRETRAIN: ''
+
+#SOLVER
+SOLVER:
+  OPTIMIZER:
+    TYPE: "adam"
+    BETAS: (0.9, 0.99)
+    WEIGHT_DECAY: 0.0001
+  BASE_LR: 0.000015
+  LR_MODE: "poly"
+  LR_STEPS: [10, 20, 30]
+  EPOCHS: 100
+  GROUP_EPOCH: 1
+  GROUP_EPOCH_DATA: 4  # 300
+
+#LOSS
+LOSS:
+  TYPE: "ML:ce_loss+dice_loss"
+  WEIGHT: [1.0, 1.0]
+  CLASS_WEIGHT: [1.0, 5.00]
+  IGNORE_INDEX: -100
+
+#TRAIN
+TRAIN:
+  RESUME: False
+  PRINT: 2 #20  #100
+  START_VALIDATE: 1 #6
+  VALIDATE_FREQUENCE: 1
+  DATA:
+    WORKERS: 8 #16
+    TRAIN_LIST: "./raws/part_train.txt"  # Pos + Neg
+    VAL_LIST: "./raws/part_val.txt"
+    BATCH_SIZE: 16
+    PATCH_SIZE: (80, 80, 80) # z,x,y
+    WL_WW: (450, 900)
+    PATCH_OFFSET: (2, 2, 2)
+    TRAIN_NUM_USE: -1
+    VAL_NUM_USE: -1
+    NII_FOLDER: './raws/image'
+    ANEURYSM_FOLDER: './raws/mask'
+    ANEURYSM_BBOX: './raws/lesion_bbox.txt'
+
+#TEST
+TEST:
+  SAVE: True # save eval result mask
+  SAVE_DIR: 'raws/output'
+  MODEL_PTH: './best_model/da_resunet.pth.tar'
+  DATA:
+    WORKERS: 16
+    TEST_FILE: './raws/part_test.txt'
+    BATCH_SIZE: 16
+    NII_FOLDER: './raws/image'
+    PATCH_SIZE: (80, 80, 80)
+    TEST_NUM_USE: -1
+
+OUTPUT_DIR: "daresunet_adam_ce_dice_loss_from0_lr15e-5_ps_80x80x80_wl_wl_450_900_without_bone_with_pt"
+SAVE_ALL: True #False, save all train model weight/epoch
+
