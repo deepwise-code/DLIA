@@ -63,4 +63,4 @@ target/
 .idea/*
 *un~
 my_local_dir/
-*.ipynb*
+#*.ipynb*
