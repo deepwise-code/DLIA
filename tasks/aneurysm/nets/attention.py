@@ -1,9 +1,3 @@
-###########################################################################
-# Created by: CASIA IVA
-# Email: jliu@nlpr.ia.ac.cn
-# Copyright (c) 2018
-###########################################################################
-
 import numpy as np
 import torch
 import math
